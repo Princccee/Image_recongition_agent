@@ -1,0 +1,6 @@
+djnago
+djangorestframework
+requests
+pillow
+huggingface_hub
+python-dotenv
