@@ -22,7 +22,7 @@ SERVICE_ACCOUNT_FILE = os.getenv("SERVICE_ACCOUNT_FILE")
 client = InferenceClient(provider="fireworks-ai", api_key=HF_API_KEY)
 
 def upload_to_google_drive(image_file):
-    """Uploads an in-memory image file directly to Google Drive and returns a public URL"""
+    """Uploads an in-memory image file to Google Drive and returns a direct image URL"""
 
     SCOPES = ["https://www.googleapis.com/auth/drive.file"]
     credentials = service_account.Credentials.from_service_account_file(
@@ -32,7 +32,7 @@ def upload_to_google_drive(image_file):
 
     file_metadata = {
         "name": image_file.name,
-        "parents": [GOOGLE_DRIVE_FOLDER_ID],  # Upload to specific folder
+        "parents": [GOOGLE_DRIVE_FOLDER_ID],  # Upload to a specific folder
     }
 
     media = MediaIoBaseUpload(image_file, mimetype=image_file.content_type)
@@ -47,10 +47,14 @@ def upload_to_google_drive(image_file):
             body={"role": "reader", "type": "anyone"},
         ).execute()
 
-        return f"https://drive.google.com/uc?id={file_id}"
+        # Get a direct image link
+        direct_url = f"https://lh3.googleusercontent.com/d/{file_id}"
+        return direct_url
+
     except HttpError as e:
         print(f"Upload failed: {e}")
         return None
+
 
 
 @api_view(["POST"])
@@ -102,7 +106,7 @@ def process_image(request):
             max_tokens=500
         )
         response_text = completion.choices[0].message.content
-        print(response_text)
+        # print(response_text)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
 
